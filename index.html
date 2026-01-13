@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DM Chat</title>
+  <style>
+    :root{
+      --bg: #0b1020;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.09);
+      --stroke: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.65);
+      --muted2: rgba(255,255,255,.48);
+      --shadow: 0 18px 60px rgba(0,0,0,.35);
+      --radius: 18px;
+      --radius2: 14px;
+      --accent: #7c5cff;
+      --accent2:#22c55e;
+      --danger:#ef4444;
+    }
+
+    *{ box-sizing: border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text);
+      background:
+        radial-gradient(1200px 800px at 20% 10%, rgba(124,92,255,.35), transparent 55%),
+        radial-gradient(900px 700px at 90% 20%, rgba(34,197,94,.22), transparent 60%),
+        radial-gradient(1200px 900px at 70% 90%, rgba(59,130,246,.16), transparent 60%),
+        var(--bg);
+      min-height: 100vh;
+    }
+
+    .shell{
+      max-width: 1100px;
+      margin: 26px auto;
+      padding: 0 14px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:10px;
+    }
+    .logo{
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(34,197,94,.85));
+      box-shadow: 0 10px 30px rgba(124,92,255,.25);
+    }
+    .brand h1{
+      font-size: 16px;
+      margin:0;
+      letter-spacing: .2px;
+    }
+    .brand p{
+      margin:0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .card{
+      background: var(--panel);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .auth{
+      padding: 14px;
+    }
+    .authRow{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+    .field{
+      flex: 1 1 220px;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    .field svg{ width:18px; height:18px; opacity:.75; }
+    .field input{
+      width:100%;
+      border:none;
+      outline:none;
+      color: var(--text);
+      background: transparent;
+      font-size: 14px;
+    }
+    .field input::placeholder{ color: rgba(255,255,255,.40); }
+
+    .btn{
+      border:none;
+      cursor:pointer;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-weight: 650;
+      letter-spacing: .2px;
+      color: var(--text);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      transition: transform .08s ease, background .15s ease, border .15s ease;
+    }
+    .btn:hover{ background: rgba(255,255,255,.12); }
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(124,92,255,.55));
+      border: 1px solid rgba(124,92,255,.65);
+    }
+    .btn.ghost{
+      background: transparent;
+    }
+    .btn.danger{
+      background: rgba(239,68,68,.12);
+      border-color: rgba(239,68,68,.45);
+      color: rgba(255,255,255,.92);
+    }
+
+    .iconBtn{
+      padding:6px 8px;
+      border-radius:10px;
+      font-size:13px;
+      line-height:1;
+      min-width:32px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .hint{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .hint b{ color: rgba(255,255,255,.88); }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:99px;
+      background: var(--accent2);
+      box-shadow: 0 0 0 3px rgba(34,197,94,.15);
+    }
+
+    .app{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: 320px 1fr;
+      gap: 14px;
+    }
+
+    .side{
+      padding: 12px;
+      display:flex;
+      flex-direction:column;
+      min-height: 620px;
+    }
+
+    .meRow{
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .meInfo{
+      display:flex; align-items:center; gap: 10px;
+      min-width: 0;
+    }
+    .avatar{
+      width: 38px; height: 38px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.10);
+      display:flex; align-items:center; justify-content:center;
+      font-weight: 800;
+      color: rgba(255,255,255,.90);
+    }
+    .meText{ min-width:0; }
+    .meText .name{
+      font-size: 13px;
+      font-weight: 750;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .meText .sub{
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .search{
+      margin: 10px 0 12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.10);
+      outline:none;
+      color: var(--text);
+      font-size: 13px;
+    }
+    .search::placeholder{ color: rgba(255,255,255,.40); }
+
+    .users{
+      overflow:auto;
+      padding-right: 4px;
+      flex:1;
+    }
+    .userItem{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 10px 10px;
+      border-radius: 14px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: background .12s ease, border .12s ease;
+      margin-bottom: 6px;
+    }
+    .userItem:hover{
+      background: rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.10);
+    }
+    .userItem.active{
+      background: rgba(124,92,255,.18);
+      border-color: rgba(124,92,255,.35);
+    }
+    .userLeft{
+      display:flex; align-items:center; gap: 10px;
+      min-width: 0;
+    }
+    .userName{
+      font-weight: 700;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .userMeta{
+      color: var(--muted2);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .main{
+      padding: 12px;
+      display:flex;
+      flex-direction:column;
+      min-height: 620px;
+    }
+    .chatHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 10px 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      margin-bottom: 10px;
+    }
+    .chatTitle{
+      display:flex; align-items:center; gap: 10px;
+      min-width: 0;
+    }
+    .chatTitle .title{
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .chatTitle .sub{
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .chat{
+      flex: 1;
+      overflow:auto;
+      padding: 6px 6px 10px;
+      scroll-behavior:smooth;
+    }
+
+    .bubbleRow{
+      display:flex;
+      gap: 8px;
+      margin: 10px 0;
+      align-items:flex-end;
+    }
+    .bubbleRow.me{ justify-content:flex-end; }
+    .bubble{
+      max-width: min(560px, 92%);
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      line-height: 1.35;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .bubble.me{
+      background: linear-gradient(135deg, rgba(124,92,255,.85), rgba(124,92,255,.40));
+      border-color: rgba(124,92,255,.45);
+    }
+    .bubbleMeta{
+      font-size: 11px;
+      color: var(--muted2);
+      margin-top: 4px;
+    }
+    .bubbleRow.me .bubbleMeta{
+      text-align:right;
+      color: rgba(255,255,255,.75);
+    }
+
+    .composer{
+      display:flex;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      margin-top: 10px;
+    }
+    .composer input{
+      flex: 1;
+      border:none;
+      outline:none;
+      background: transparent;
+      color: var(--text);
+      font-size: 14px;
+      padding: 6px 8px;
+    }
+    .composer input::placeholder{ color: rgba(255,255,255,.40); }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(10px);
+      padding: 10px 12px;
+      border-radius: 14px;
+      color: rgba(255,255,255,.88);
+      font-size: 13px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.35);
+      display:none;
+      max-width: min(520px, calc(100% - 28px));
+    }
+
+    @media (max-width: 920px){
+      .app{ grid-template-columns: 1fr; }
+      .side{ min-height: unset; }
+      .main{ min-height: 640px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <h1>DM Chat</h1>
+          <p>Login • Realtime • 1 lawan 1</p>
+        </div>
+      </div>
+      <div class="pill"><span class="dot"></span><span id="statusText">Offline</span></div>
+    </div>
+
+    <!-- AUTH -->
+    <div class="card auth" id="authCard">
+      <div class="authRow">
+        <div class="field">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M20 21a8 8 0 0 0-16 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 13a5 5 0 1 0-5-5 5 5 0 0 0 5 5Z" stroke="currentColor" stroke-width="2"/></svg>
+          <input id="au" placeholder="username" maxlength="20" />
+        </div>
+
+        <div class="field">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M7 10V8a5 5 0 0 1 10 0v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6 10h12v10H6V10Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          <input id="ap" placeholder="password (min 6)" type="password" />
+        </div>
+
+        <button class="btn primary" id="btnLogin">Login</button>
+        <button class="btn" id="btnReg">Register</button>
+        <span id="authMsg" class="hint" style="margin:0;"></span>
+      </div>
+
+      <div class="hint">
+        <span class="pill">Tips: pakai <b>Incognito</b> untuk akun kedua</span>
+        <span class="pill">Enter = kirim pesan</span>
+      </div>
+    </div>
+
+    <!-- APP -->
+    <div class="app" id="app" style="display:none;">
+      <!-- SIDEBAR -->
+      <div class="card side">
+        <div class="meRow">
+          <div class="meInfo">
+            <div class="avatar" id="meAvatar">?</div>
+            <div class="meText">
+              <div class="name" id="meName">—</div>
+              <div class="sub">Daftar pengguna</div>
+            </div>
+          </div>
+          <button class="btn danger" id="btnLogout" title="Keluar">Logout</button>
+        </div>
+
+        <input class="search" id="search" placeholder="Cari user..." />
+
+        <div class="users" id="users"></div>
+      </div>
+
+      <!-- MAIN -->
+      <div class="card main">
+        <div class="chatHeader">
+          <div class="chatTitle">
+            <div class="avatar" id="withAvatar">💬</div>
+            <div style="min-width:0;">
+              <div class="title" id="withTitle">Pilih user untuk mulai chat</div>
+              <div class="sub" id="withSub">Chat tersimpan dan realtime</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="pill"><span class="dot" style="background:var(--accent); box-shadow: 0 0 0 3px rgba(124,92,255,.15)"></span><span>DM</span></div>
+            <button id="btnClearHistory" class="btn ghost iconBtn" title="Hapus history">🧹</button>
+          </div>
+        </div>
+
+        <div class="chat" id="chat"></div>
+
+        <form class="composer" id="composer">
+          <input id="text" placeholder="Tulis pesan..." maxlength="500" autocomplete="off" />
+          <button class="btn primary" type="submit">Kirim</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    let token = localStorage.getItem("token") || "";
+    let me = null;
+    let selectedUser = null;
+    let socket = null;
+
+    const $ = (id) => document.getElementById(id);
+
+    function initials(name){
+      const s = (name || "").trim().toUpperCase();
+      if (!s) return "?";
+      const parts = s.split(/\s+/).slice(0,2);
+      return parts.map(p => p[0]).join("");
+    }
+
+    function fmtTime(ts) {
+      return new Date(ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    }
+
+    function toast(msg){
+      const t = $("toast");
+      t.textContent = msg;
+      t.style.display = "block";
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(()=> t.style.display="none", 2400);
+    }
+
+    function setStatus(text){
+      $("statusText").textContent = text;
+    }
+
+    function clearChat(){
+      $("chat").innerHTML = "";
+    }
+
+    function addMsg(m) {
+      const isMe = m.sender_id === me.id;
+      const row = document.createElement("div");
+      row.className = "bubbleRow" + (isMe ? " me" : "");
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble" + (isMe ? " me" : "");
+      bubble.textContent = m.text;
+
+      const meta = document.createElement("div");
+      meta.className = "bubbleMeta";
+      meta.textContent = (isMe ? "Kamu" : (selectedUser?.username || "Dia")) + " • " + fmtTime(m.created_at);
+
+      bubble.appendChild(meta);
+      row.appendChild(bubble);
+      $("chat").appendChild(row);
+      $("chat").scrollTop = $("chat").scrollHeight;
+    }
+
+    async function api(path, opts={}) {
+      const res = await fetch(path, {
+        ...opts,
+        headers: {
+          "Content-Type": "application/json",
+          ...(opts.headers || {}),
+          ...(token ? { Authorization: "Bearer " + token } : {})
+        }
+      });
+      const data = await res.json().catch(()=>({}));
+      if (!res.ok) throw new Error(data.error || "Request error");
+      return data;
+    }
+
+    function markActiveUser(id) {
+      [...$("users").children].forEach(el => {
+        el.classList.toggle("active", Number(el.dataset.id) === id);
+      });
+    }
+
+    async function loadUsers() {
+      const { users } = await api("/api/users");
+      const box = $("users");
+      box.innerHTML = "";
+
+      users.forEach(u => {
+        const item = document.createElement("div");
+        item.className = "userItem";
+        item.dataset.id = u.id;
+
+        const left = document.createElement("div");
+        left.className = "userLeft";
+
+        const av = document.createElement("div");
+        av.className = "avatar";
+        av.textContent = initials(u.username);
+
+        const txt = document.createElement("div");
+        txt.style.minWidth = "0";
+
+        const name = document.createElement("div");
+        name.className = "userName";
+        name.textContent = u.username;
+
+        const meta = document.createElement("div");
+        meta.className = "userMeta";
+        meta.textContent = "Klik untuk DM";
+
+        txt.appendChild(name);
+        txt.appendChild(meta);
+
+        left.appendChild(av);
+        left.appendChild(txt);
+
+        const actions = document.createElement("div");
+        actions.style.display = "flex";
+        actions.style.alignItems = "center";
+        actions.style.gap = "6px";
+
+        const chev = document.createElement("div");
+        chev.className = "userMeta";
+        chev.textContent = "›";
+
+        const delBtn = document.createElement("button");
+        delBtn.className = "btn ghost iconBtn";
+        delBtn.title = "Hapus kontak";
+        delBtn.textContent = "🗑";
+        delBtn.onclick = (ev) => { ev.stopPropagation(); deleteContact(u.id); };
+
+        actions.appendChild(delBtn);
+        actions.appendChild(chev);
+
+        item.appendChild(left);
+        item.appendChild(actions);
+
+        item.onclick = () => selectUser(u);
+        box.appendChild(item);
+      });
+
+      // filter search
+      const q = $("search").value.trim().toLowerCase();
+      if (q) filterUsers(q);
+    }
+
+    function filterUsers(q){
+      q = q.toLowerCase();
+      [...$("users").children].forEach(el => {
+        const name = el.querySelector(".userName")?.textContent?.toLowerCase() || "";
+        el.style.display = name.includes(q) ? "" : "none";
+      });
+    }
+
+    async function selectUser(u) {
+      selectedUser = u;
+      $("withTitle").textContent = u.username;
+      $("withAvatar").textContent = initials(u.username);
+      $("withSub").textContent = "Rekaman chat & realtime";
+      clearChat();
+      markActiveUser(u.id);
+
+      const { messages } = await api("/api/messages/" + u.id);
+      messages.forEach(addMsg);
+
+      $("text").focus();
+    }
+
+    function connectSocket() {
+      socket = io({ auth: { token } });
+
+      socket.on("connect", () => setStatus("Online"));
+      socket.on("disconnect", () => setStatus("Offline"));
+
+      socket.on("connect_error", (e) => {
+        $("authMsg").textContent = "Socket error: " + e.message;
+        setStatus("Offline");
+      });
+
+      socket.on("dm", (m) => {
+        if (!selectedUser) return;
+
+        const a = m.sender_id === selectedUser.id && m.receiver_id === me.id;
+        const b = m.sender_id === me.id && m.receiver_id === selectedUser.id;
+        if (a || b) addMsg(m);
+        else toast("Ada pesan masuk dari user lain");
+      });
+    }
+
+    $("composer").addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!socket || !selectedUser) return toast("Pilih user dulu");
+      const text = $("text").value.trim();
+      if (!text) return;
+
+      socket.emit("dm", { toUserId: selectedUser.id, text });
+      $("text").value = "";
+      $("text").focus();
+    });
+
+    $("text").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        // Enter kirim, Shift+Enter tidak dipakai (input 1 baris)
+        e.preventDefault();
+        $("composer").requestSubmit();
+      }
+    });
+
+    $("search").addEventListener("input", (e) => filterUsers(e.target.value.trim()));
+
+    $("btnLogout").onclick = () => {
+      localStorage.removeItem("token");
+      token = "";
+      me = null;
+      selectedUser = null;
+      if (socket) socket.disconnect();
+      socket = null;
+
+      $("app").style.display = "none";
+      $("authCard").style.display = "block";
+      $("authMsg").textContent = "";
+      setStatus("Offline");
+      toast("Logout berhasil");
+    };
+
+    async function afterAuth() {
+      const meRes = await api("/api/me");
+      me = meRes.user;
+
+      $("authCard").style.display = "none";
+      $("app").style.display = "grid";
+
+      $("meName").textContent = me.username;
+      $("meAvatar").textContent = initials(me.username);
+
+      await loadUsers();
+      connectSocket();
+      toast("Berhasil login");
+    }
+
+    $("btnLogin").onclick = async () => {
+      $("authMsg").textContent = "";
+      try {
+        const username = $("au").value.trim();
+        const password = $("ap").value;
+        const res = await api("/api/login", {
+          method: "POST",
+          body: JSON.stringify({ username, password }),
+          headers: {}
+        });
+        token = res.token;
+        localStorage.setItem("token", token);
+        await afterAuth();
+      } catch (e) { $("authMsg").textContent = e.message; }
+    };
+
+    $("btnReg").onclick = async () => {
+      $("authMsg").textContent = "";
+      try {
+        const username = $("au").value.trim();
+        const password = $("ap").value;
+        const res = await api("/api/register", {
+          method: "POST",
+          body: JSON.stringify({ username, password }),
+          headers: {}
+        });
+        token = res.token;
+        localStorage.setItem("token", token);
+        await afterAuth();
+      } catch (e) { $("authMsg").textContent = e.message; }
+    };
+
+    // delete chat history with a user
+    async function deleteChatHistory(userId){
+      if (!userId) return toast('Pilih user dulu');
+      const ok = confirm('Hapus seluruh history chat dengan user ini? Tindakan ini tidak bisa dibatalkan.');
+      if (!ok) return;
+      try{
+        await api('/api/messages/' + userId, { method: 'DELETE' });
+        toast('History chat dihapus');
+        if (selectedUser && selectedUser.id === userId) clearChat();
+        await loadUsers();
+      }catch(e){
+        toast('Gagal menghapus: ' + e.message);
+      }
+    }
+
+    // delete contact (remove user) - backend should handle auth and permissions
+    async function deleteContact(userId){
+      if (!userId) return;
+      const ok = confirm('Hapus kontak ini? Pesan dan informasi terkait mungkin juga dihapus');
+      if (!ok) return;
+      try{
+        await api('/api/users/' + userId, { method: 'DELETE' });
+        toast('Kontak dihapus');
+        // if currently selected, clear selection
+        if (selectedUser && selectedUser.id === userId){
+          selectedUser = null;
+          clearChat();
+          $("withTitle").textContent = 'Pilih user untuk mulai chat';
+          $("withAvatar").textContent = '💬';
+          $("withSub").textContent = 'Chat tersimpan dan realtime';
+        }
+        await loadUsers();
+      }catch(e){
+        toast('Gagal menghapus kontak: ' + e.message);
+      }
+    }
+
+    // attach clear history button
+    $("btnClearHistory").addEventListener('click', ()=>{
+      if (!selectedUser) return toast('Pilih user dulu');
+      deleteChatHistory(selectedUser.id);
+    });
+
+    // auto-login kalau token ada
+    (async () => {
+      if (!token) return;
+      try { await afterAuth(); } catch { localStorage.removeItem("token"); token=""; }
+    })();
+  </script>
+</body>
+</html>
